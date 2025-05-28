@@ -1,11 +1,9 @@
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 import requests
-import os
 
 app = FastAPI()
 
-# Allow requests from any origin (your GitHub Pages frontend, etc.)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -14,7 +12,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Read the OpenRouter API key from the environment variable
+# Step 1: Put your API key here directly
 OPENROUTER_API_KEY = "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"
 
 @app.post("/")
@@ -22,7 +20,6 @@ async def chat(request: Request):
     data = await request.json()
     user_input = data.get("message", "")
 
-    # System message tells the model to reply only in Punjabi (Pinglish)
     messages = [
         {
             "role": "system",
@@ -35,7 +32,8 @@ async def chat(request: Request):
     ]
 
     headers = {
-        "Authorization": f"Bearer {OPENROUTER_API_KEY}"
+        "Authorization": f"Bearer {OPENROUTER_API_KEY}",
+        "Content-Type": "application/json"
     }
 
     payload = {
@@ -52,6 +50,8 @@ async def chat(request: Request):
 
     try:
         result = response.json()
+        if "choices" not in result:
+            return {"error": "OpenRouter returned no choices", "full_response": result}
         return {"reply": result["choices"][0]["message"]["content"]}
     except Exception as e:
         return {"error": "API error", "details": str(e)}
