@@ -5,7 +5,7 @@ import os
 
 app = FastAPI()
 
-# Allow cross-origin calls (so your frontend can talk to it)
+# Allow requests from any origin (your GitHub Pages frontend, etc.)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -14,7 +14,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Read your OpenRouter key from an environment variable
+# Read the OpenRouter API key from the environment variable
 OPENROUTER_API_KEY = os.getenv("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")
 
 @app.post("/chat")
@@ -22,7 +22,7 @@ async def chat(request: Request):
     data = await request.json()
     user_input = data.get("message", "")
 
-    # Tell the model: “Reply only in Punjabi (English letters)”
+    # System message tells the model to reply only in Punjabi (Pinglish)
     messages = [
         {
             "role": "system",
@@ -35,7 +35,7 @@ async def chat(request: Request):
     ]
 
     headers = {
-        "Authorization": f"Bearer {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}"
+        "Authorization": f"Bearer {OPENROUTER_API_KEY}"
     }
 
     payload = {
