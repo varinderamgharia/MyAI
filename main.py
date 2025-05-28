@@ -15,7 +15,7 @@ app.add_middleware(
 )
 
 # Read the OpenRouter API key from the environment variable
-OPENROUTER_API_KEY = os.getenv("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")
+OPENROUTER_API_KEY = "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"
 
 @app.post("/")
 async def chat(request: Request):
